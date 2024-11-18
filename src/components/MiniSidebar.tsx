@@ -30,7 +30,7 @@ export function MiniSidebar() {
   ];
 
   return (
-    <main className="flex h-full w-full basis-[5rem] flex-col bg-[#f9f9f9]">
+    <main className="flex h-full w-full basis-[5rem] flex-col bg-[#f9f9f9] dark:bg-[#1A1A1A]">
       <span className="flex h-[5rem] items-center justify-center">Logo</span>
       <div className="mt-8 flex flex-1 flex-col items-center justify-between">
         <ul className="flex flex-col gap-10">

@@ -1,21 +1,22 @@
 import { IconCheck } from "@/lib/icons/IconCheck";
 import { MyLink } from "./common/MyLink";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import ThemeSwitch from "./ThemeSwitch";
 
 export async function Header() {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
   return (
-    <header className="my-4 flex w-full items-center justify-between bg-[#f9f9f9] px-6">
+    <header className="my-4 flex w-full items-center justify-between bg-[#f9f9f9] px-6 dark:bg-[#1A1A1A]">
       <section>
         <h1 className="text-lg font-medium">
           <span role="img" aria-label="wave">
             👋
           </span>
           {user
-            ? `welcome ${user?.given_name} to FirstTask`
-            : "Welcome to FirstTask"}
+            ? `welcome ${user?.given_name} to TaskTide`
+            : "Welcome to TaskTide"}
         </h1>
         <p>
           {user ? (
@@ -29,9 +30,12 @@ export async function Header() {
         </p>
       </section>
       <section className="flex h-[50px] items-center gap-[10.4rem]">
-        <button className="rounded-[50px] bg-[#3aafae] px-8 py-3 text-white transition-all duration-200 ease-in-out hover:bg-[#00A1F1] hover:text-white">
-          Create a new task
-        </button>
+        <div className="flex items-center gap-3">
+          <ThemeSwitch />
+          <button className="rounded-[50px] bg-[#3aafae] px-8 py-3 text-white transition-all duration-200 ease-in-out hover:bg-[#00A1F1] hover:text-white">
+            Create a new task
+          </button>
+        </div>
         <nav className="flex items-center gap-4">
           <MyLink
             href="/"
