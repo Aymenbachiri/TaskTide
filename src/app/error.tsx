@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { MyLink } from "@/components/common/MyLink";
+import { MyImage } from "@/components/common/MyImage";
+import img from "/public/assets/images/error-image.webp";
 
 export default function Error({
   error,
@@ -25,6 +27,18 @@ export default function Error({
       <article className="w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-xl dark:bg-black">
         <div className="p-8">
           <header className="flex flex-col items-center md:flex-row">
+            <figure className="mb-6 w-full md:mb-0 md:w-1/2">
+              <MyImage
+                src={img}
+                alt="Error illustration"
+                className="h-auto w-full rounded-lg"
+                width={340}
+                height={260}
+                placeholder="blur"
+                sizes="(min-width: 1120px) 480px, (min-width: 780px) 43.13vw, calc(100vw - 96px)"
+                style={{ borderRadius: "1rem" }}
+              />
+            </figure>
             <section className="w-full md:w-1/2 md:pl-8">
               <h1 className="mb-2 text-2xl font-bold text-red-600">Oops!</h1>
               <h2 className="mb-4 text-4xl font-semibold text-gray-800 dark:text-gray-200">
