@@ -1,5 +1,6 @@
 "use client";
 
+import { useTheme } from "next-themes";
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
 import {
   Card,
@@ -30,33 +31,16 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function RadialChart() {
+  const { theme } = useTheme();
+
   const tasks: Task[] = [
-    {
-      id: "1",
-      title: "Task 1",
-      completed: true,
-    },
-    {
-      id: "2",
-      title: "Task 2",
-      completed: false,
-    },
-    {
-      id: "3",
-      title: "Task 3",
-      completed: true,
-    },
-    {
-      id: "4",
-      title: "Task 4",
-      completed: false,
-    },
-    {
-      id: "5",
-      title: "Task 5",
-      completed: true,
-    },
+    { id: "1", title: "Task 1", completed: true },
+    { id: "2", title: "Task 2", completed: false },
+    { id: "3", title: "Task 3", completed: true },
+    { id: "4", title: "Task 4", completed: false },
+    { id: "5", title: "Task 5", completed: true },
   ];
+
   const tasksTotal = tasks.length;
   const completedTasks = tasks.filter((task) => task.completed);
   const activeTasks = tasks.filter((task) => !task.completed);
@@ -76,46 +60,41 @@ export function RadialChart() {
       <CardContent className="flex flex-1 items-center pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square w-full max-w-[250px]"
+          className="mx-auto aspect-square w-full max-w-[250px] dark:bg-[#1A1A1A]"
         >
           <RadialBarChart
             data={chartData}
             endAngle={180}
             innerRadius={80}
             outerRadius={130}
+            style={{ backgroundColor: "transparent" }}
           >
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <PolarRadiusAxis
-              className="dark:text-white"
-              tick={false}
-              tickLine={false}
-              axisLine={false}
-            >
+            <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
               <Label
-                className="dark:text-white"
                 content={({ viewBox }) => {
                   if (viewBox && "cx" in viewBox && "cy" in viewBox) {
                     return (
                       <text
-                        className="dark:text-white"
                         x={viewBox.cx}
                         y={viewBox.cy}
+                        fill={theme === "dark" ? "white" : "black"}
                         textAnchor="middle"
                       >
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) - 16}
-                          className="fill-foreground text-2xl font-bold dark:text-white"
+                          className={`fill-foreground text-2xl font-bold`}
                         >
                           {tasksTotal}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 4}
-                          className="fill-muted-foreground dark:text-white"
+                          className={`fill-muted-foreground`}
                         >
                           Tasks
                         </tspan>

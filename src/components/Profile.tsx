@@ -5,8 +5,6 @@ export async function Profile() {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
-  console.log(user.picture);
-
   return (
     <main className="m-6">
       <div className="flex cursor-pointer items-center gap-3 rounded-[0.8rem] border-2 border-transparent bg-[#E6E6E6]/20 px-2 py-4 transition duration-300 ease-in-out hover:border-2 hover:border-white hover:bg-[#E6E6E6]/50">

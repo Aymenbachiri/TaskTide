@@ -62,7 +62,7 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
   const handleInput =
     (name: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
       if (name === "setTask") {
-        setTask(e);
+        setTask(e.target);
       } else {
         setTask({ ...task, [name]: e.target.value });
       }
