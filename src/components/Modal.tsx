@@ -31,7 +31,6 @@ export function Modal() {
 
   useEffect(() => {
     if (modalMode === "edit" && activeTask) {
-      // Need to type cast this since handleInput expects ChangeEvent but we're passing Task
       handleInput("setTask")(
         activeTask as unknown as React.ChangeEvent<HTMLInputElement>,
       );
@@ -51,7 +50,6 @@ export function Modal() {
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    // Create a synthetic event that matches the expected input event type
     const syntheticEvent = {
       target: {
         name: e.target.name,
@@ -63,7 +61,6 @@ export function Modal() {
   };
 
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    // Create a synthetic event that matches the expected input event type
     const syntheticEvent = {
       target: {
         name: e.target.name,
