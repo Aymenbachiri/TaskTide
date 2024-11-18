@@ -1,20 +1,10 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import { API_URL } from "../constants";
-
-type Task = {
-  id: string;
-  title: string;
-  description?: string;
-  priority: "low" | "medium" | "high";
-  completed: boolean;
-};
+import { createContext, useContext, useState } from "react";
+import type { Task } from "../types/types";
 
 type TasksContextType = {
   tasks: Task[];
   loading: boolean;
   task: Partial<Task>;
-  activeTasks: Task[];
-  completedTasks: Task[];
   priority: string;
   isEditing: boolean;
   activeTask: Task | null;
@@ -25,8 +15,6 @@ type TasksContextType = {
   handleInput: (
     name: string,
   ) => (e: React.ChangeEvent<HTMLInputElement>) => void;
-  getTasks: () => Promise<void>;
-  getTask: (taskId: string) => Promise<void>;
   openModalForAdd: () => void;
   openModalForEdit: (task: Task) => void;
   openProfileModal: () => void;
@@ -38,8 +26,6 @@ const TasksContext = createContext<TasksContextType | undefined>(undefined);
 export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(false);
   const [task, setTask] = useState<Partial<Task>>({});
   const [isEditing, setIsEditing] = useState(false);
   const [priority, setPriority] = useState("all");
@@ -71,30 +57,6 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     setTask({});
   };
 
-  const getTasks = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/tasks`);
-      const data = await response.json();
-      setTasks(data.tasks);
-    } catch (error) {
-      console.error("Error getting tasks", error);
-    }
-    setLoading(false);
-  };
-
-  const getTask = async (taskId: string) => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/task/${taskId}`);
-      const data = await response.json();
-      setTask(data);
-    } catch (error) {
-      console.error("Error getting task", error);
-    }
-    setLoading(false);
-  };
-
   const handleInput =
     (name: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
       if (name === "setTask") {
@@ -104,19 +66,8 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
 
-  const completedTasks = tasks.filter((task) => task.completed);
-  const activeTasks = tasks.filter((task) => !task.completed);
-
-  useEffect(() => {
-    getTasks();
-  }, []);
-
   const contextValue: TasksContextType = {
-    tasks,
-    loading,
     task,
-    activeTasks,
-    completedTasks,
     priority,
     isEditing,
     activeTask,
@@ -125,12 +76,12 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     setPriority,
     setIsEditing,
     handleInput,
-    getTasks,
-    getTask,
     openModalForAdd,
     openModalForEdit,
     openProfileModal,
     closeModal,
+    tasks: [],
+    loading: false,
   };
 
   return (
