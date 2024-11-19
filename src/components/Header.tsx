@@ -2,6 +2,7 @@ import { IconCheck } from "@/lib/icons/IconCheck";
 import { MyLink } from "./common/MyLink";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import ThemeSwitch from "./ThemeSwitch";
+import { CreateNewTask } from "./CreateNewTask";
 
 export async function Header() {
   const { getUser } = getKindeServerSession();
@@ -32,9 +33,7 @@ export async function Header() {
       <section className="flex h-[50px] items-center gap-[10.4rem]">
         <div className="flex items-center gap-3">
           <ThemeSwitch />
-          <button className="rounded-[50px] bg-[#3aafae] px-8 py-3 text-white transition-all duration-200 ease-in-out hover:bg-[#00A1F1] hover:text-white">
-            Create a new task
-          </button>
+          <CreateNewTask />
         </div>
         <nav className="flex items-center gap-4">
           <MyLink

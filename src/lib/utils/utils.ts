@@ -22,3 +22,17 @@ export const filteredTasks = (tasks: Task[], priority: string) => {
 
   return filteredTasks();
 };
+
+export const overdueTasks = (tasks: Task[]) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return tasks.filter((task) => {
+    if (!task.dueDate || task.completed) return false;
+
+    const dueDate = new Date(task.dueDate);
+    dueDate.setHours(0, 0, 0, 0);
+
+    return dueDate < today;
+  });
+};

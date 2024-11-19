@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { ProfileHolder } from "./ProfileHolder";
 
 export async function Profile() {
   const { getUser } = getKindeServerSession();
@@ -8,7 +7,7 @@ export async function Profile() {
 
   return (
     <main className="m-6">
-      <ProfileHolder>
+      <div className="flex cursor-pointer items-center gap-3 rounded-[0.8rem] border-2 border-transparent bg-[#E6E6E6]/20 px-2 py-4 transition duration-300 ease-in-out hover:border-2 hover:border-white hover:bg-[#E6E6E6]/50">
         <section>
           <img
             src="https://img.favpng.com/17/3/18/computer-icons-user-profile-male-png-favpng-ZmC9dDrp9x27KFnnge0jKWKBs.jpg"
@@ -17,12 +16,12 @@ export async function Profile() {
           />
         </section>
         <section>
-          <h1 className="flex flex-col text-xl">
+          <h1 className="flex items-center text-xl">
             <span className="font-medium">Hello,</span>
             <span className="font-bold">{user?.given_name}</span>
           </h1>
         </section>
-      </ProfileHolder>
+      </div>
 
       <div className="mt-6 flex flex-col gap-8 dark:text-white">
         <div className="grid grid-cols-2 gap-4">

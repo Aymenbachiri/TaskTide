@@ -1,6 +1,7 @@
 import { MySuspense } from "@/lib/utils/MySuspense";
 import { Filters } from "../Filters";
 import { Tasks } from "../Tasks";
+import { AddNewTaskBtn } from "../AddNewTaskBtn";
 
 export default function HomePage() {
   return (
@@ -13,9 +14,7 @@ export default function HomePage() {
         <MySuspense fallback={<div>Loading...</div>}>
           <Tasks />
         </MySuspense>
-        <button className="h-[16rem] w-full rounded-md border-2 border-dashed border-gray-400 py-2 text-lg font-medium text-gray-500 transition duration-200 ease-in-out hover:border-none hover:bg-gray-300">
-          Add New Task
-        </button>
+        <AddNewTaskBtn />
       </div>
     </main>
   );

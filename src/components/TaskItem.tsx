@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteTask } from "@/lib/actions/deleteTask";
+import { item } from "@/lib/animations/AppearAnimation";
 import { useTasks } from "@/lib/context/TaskContext";
 import { getPriorityColor } from "@/lib/helpers/getPriorityColor";
 import { EditIcon } from "@/lib/icons/EditIcon";
@@ -8,12 +9,16 @@ import { StarIcon } from "@/lib/icons/StarIcon";
 import { TrashIcon } from "@/lib/icons/TrashIcon";
 import type { Task } from "@/lib/types/types";
 import { cn } from "@/lib/utils/utils";
+import { motion } from "framer-motion";
 
 export function TaskItem({ task }: { task: Task }) {
   const { openModalForEdit } = useTasks();
 
   return (
-    <main className="flex h-[16rem] flex-col gap-4 rounded-lg border-2 border-white bg-[#f9f9f9] px-4 py-3 shadow-sm dark:border-gray-500 dark:bg-[#1A1A1A]">
+    <motion.main
+      variants={item}
+      className="flex h-[16rem] flex-col gap-4 rounded-lg border-2 border-white bg-[#f9f9f9] px-4 py-3 shadow-sm dark:border-gray-500 dark:bg-[#1A1A1A]"
+    >
       <section>
         <h4 className="text-2xl font-bold">{task.title}</h4>
         <p>{task.description}</p>
@@ -49,6 +54,6 @@ export function TaskItem({ task }: { task: Task }) {
           </button>
         </section>
       </div>
-    </main>
+    </motion.main>
   );
 }
