@@ -1,24 +1,21 @@
 "use client";
-
-import { createTask } from "@/lib/actions/createTask";
-import { updateTask } from "@/lib/actions/updateTask";
 import { useTasks } from "@/lib/context/TaskContext";
 import { useDetectOutside } from "@/lib/hooks/useDetectOutside";
-import type { Task } from "@/lib/types/types";
+import { Task } from "@/lib/types/types";
 import { useEffect, useRef } from "react";
 
 export function Modal() {
-  const task: Task = {
-    id: "1",
-    title: "Task 1",
-    description: "This is a task description",
-    completed: false,
-    priority: "high",
-    dueDate: "2023-01-01",
-  };
-  const { handleInput, isEditing, closeModal, modalMode, activeTask } =
-    useTasks();
-  const ref = useRef<HTMLFormElement>(null);
+  const {
+    task,
+    handleInput,
+    createTask,
+    isEditing,
+    closeModal,
+    modalMode,
+    activeTask,
+    updateTask,
+  } = useTasks();
+  const ref = useRef(null);
 
   useDetectOutside({
     ref,
@@ -31,49 +28,26 @@ export function Modal() {
 
   useEffect(() => {
     if (modalMode === "edit" && activeTask) {
-      handleInput("setTask")(
-        activeTask as unknown as React.ChangeEvent<HTMLInputElement>,
-      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      handleInput("setTask")(activeTask as any);
     }
   }, [modalMode, activeTask, handleInput]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
 
-    if (modalMode === "edit" && activeTask?.id) {
-      await updateTask(activeTask.id, formData);
+    if (modalMode === "edit") {
+      updateTask(task as Task);
     } else if (modalMode === "add") {
-      await createTask(formData);
+      createTask(task as Task);
     }
     closeModal();
   };
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const syntheticEvent = {
-      target: {
-        name: e.target.name,
-        value: e.target.value,
-      },
-    } as unknown as React.ChangeEvent<HTMLInputElement>;
-
-    handleInput(e.target.name)(syntheticEvent);
-  };
-
-  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const syntheticEvent = {
-      target: {
-        name: e.target.name,
-        value: e.target.value,
-      },
-    } as unknown as React.ChangeEvent<HTMLInputElement>;
-
-    handleInput(e.target.name)(syntheticEvent);
-  };
-
   return (
-    <main className="fixed left-0 top-0 z-50 h-full w-full overflow-hidden bg-[#333]/30">
+    <div className="fixed left-0 top-0 z-50 h-full w-full overflow-hidden bg-[#333]/30">
       <form
+        action=""
         className="absolute left-1/2 top-1/2 flex w-full max-w-[520px] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-3 rounded-lg bg-white px-6 py-5 shadow-md dark:bg-[#0D0D0D]"
         onSubmit={handleSubmit}
         ref={ref}
@@ -86,7 +60,7 @@ export function Modal() {
             id="title"
             placeholder="Task Title"
             name="title"
-            value={task.title || ""}
+            value={task?.title}
             onChange={(e) => handleInput("title")(e)}
           />
         </div>
@@ -97,8 +71,8 @@ export function Modal() {
             name="description"
             placeholder="Task Description"
             rows={4}
-            value={task.description || ""}
-            onChange={handleTextAreaChange}
+            value={task?.description}
+            onChange={(e) => handleInput("description")(e)}
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -106,8 +80,8 @@ export function Modal() {
           <select
             className="cursor-pointer rounded-md border bg-[#F9F9F9] p-2 dark:bg-[#1A1A1A]"
             name="priority"
-            value={task.priority || "low"}
-            onChange={handleSelectChange}
+            value={task?.priority}
+            onChange={(e) => handleInput("priority")(e)}
           >
             <option value="low">Low</option>
             <option value="medium">Medium</option>
@@ -120,7 +94,7 @@ export function Modal() {
             className="rounded-md border bg-[#F9F9F9] p-2 dark:bg-[#1A1A1A]"
             type="date"
             name="dueDate"
-            value={task.dueDate || ""}
+            value={task?.dueDate || ""}
             onChange={(e) => handleInput("dueDate")(e)}
           />
         </div>
@@ -130,10 +104,10 @@ export function Modal() {
             <label htmlFor="completed">Completed</label>
             <div>
               <select
-                className="cursor-pointer rounded-md border bg-[#F9F9F9] p-2 dark:bg-[#1A1A1A]"
+                className="cursor-pointer rounded-md border bg-[#212121] p-2 dark:bg-[#1A1A1A]"
                 name="completed"
-                value={task.completed ? "true" : "false"}
-                onChange={handleSelectChange}
+                value={task?.completed ? "true" : "false"}
+                onChange={(e) => handleInput("completed")(e)}
               >
                 <option value="false">No</option>
                 <option value="true">Yes</option>
@@ -153,6 +127,6 @@ export function Modal() {
           </button>
         </div>
       </form>
-    </main>
+    </div>
   );
 }

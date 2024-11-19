@@ -1,6 +1,5 @@
 "use client";
 
-import { deleteTask } from "@/lib/actions/deleteTask";
 import { item } from "@/lib/animations/AppearAnimation";
 import { useTasks } from "@/lib/context/TaskContext";
 import { getPriorityColor } from "@/lib/helpers/getPriorityColor";
@@ -12,7 +11,7 @@ import { cn, formatDate } from "@/lib/utils/utils";
 import { motion } from "framer-motion";
 
 export function TaskItem({ task }: { task: Task }) {
-  const { openModalForEdit } = useTasks();
+  const { openModalForEdit, deleteTask, getTaskById } = useTasks();
 
   return (
     <motion.main
@@ -40,6 +39,7 @@ export function TaskItem({ task }: { task: Task }) {
           </button>
           <button
             onClick={() => {
+              getTaskById(task.id);
               openModalForEdit(task);
             }}
             className="text-[#00A1F1]"
@@ -47,9 +47,7 @@ export function TaskItem({ task }: { task: Task }) {
             <EditIcon />
           </button>
           <button
-            onClick={async () => {
-              await deleteTask(task.id);
-            }}
+            onClick={() => deleteTask(task.id)}
             className="text-[#F65314]"
           >
             <TrashIcon />
