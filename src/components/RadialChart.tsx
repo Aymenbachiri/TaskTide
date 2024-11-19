@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
 import {
@@ -16,10 +17,12 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "./ui/chart";
-import type { Task } from "@/lib/types/types";
 import { TrendingUp } from "@/lib/icons/TrendingUp";
+import { Task } from "@/lib/types/types";
+import { getTasks, getTasksResponse } from "@/lib/helpers/getTasks";
+import { RadialChartSkeleton } from "./RadialChartSkeleton";
 
-const chartConfig = {
+const chartConfig: ChartConfig = {
   desktop: {
     label: "Completed",
     color: "#8BCE89",
@@ -28,28 +31,37 @@ const chartConfig = {
     label: "Pending",
     color: "#EB4E31",
   },
-} satisfies ChartConfig;
+};
 
 export function RadialChart() {
   const { theme } = useTheme();
+  const [chartData, setChartData] = useState<{
+    totalTasks: number;
+    activeTasks: number;
+    completedTasks: number;
+  } | null>(null);
 
-  const tasks: Task[] = [
-    { id: "1", title: "Task 1", completed: true },
-    { id: "2", title: "Task 2", completed: false },
-    { id: "3", title: "Task 3", completed: true },
-    { id: "4", title: "Task 4", completed: false },
-    { id: "5", title: "Task 5", completed: true },
-  ];
+  useEffect(() => {
+    async function fetchData() {
+      const tasks: getTasksResponse = await getTasks();
+      const totalTasks = tasks.length;
+      const activeTasks = tasks.tasks.filter(
+        (task: Task) => !task.completed,
+      ).length;
+      const completedTasks = tasks.tasks.filter(
+        (task: Task) => task.completed,
+      ).length;
+      setChartData({ totalTasks, activeTasks, completedTasks });
+    }
 
-  const tasksTotal = tasks.length;
-  const completedTasks = tasks.filter((task) => task.completed);
-  const activeTasks = tasks.filter((task) => !task.completed);
-  const chartData = [
-    {
-      pending: activeTasks.length,
-      completed: completedTasks.length,
-    },
-  ];
+    fetchData();
+  }, []);
+
+  if (!chartData) {
+    return <RadialChartSkeleton />;
+  }
+
+  const { totalTasks, activeTasks, completedTasks } = chartData;
 
   return (
     <Card className="flex flex-col border-2 border-white bg-[#EDEDED] shadow-none dark:bg-[#1A1A1A] dark:text-white">
@@ -63,7 +75,7 @@ export function RadialChart() {
           className="mx-auto aspect-square w-full max-w-[250px] dark:bg-[#1A1A1A]"
         >
           <RadialBarChart
-            data={chartData}
+            data={[{ pending: activeTasks, completed: completedTasks }]}
             endAngle={180}
             innerRadius={80}
             outerRadius={130}
@@ -89,7 +101,7 @@ export function RadialChart() {
                           y={(viewBox.cy || 0) - 16}
                           className={`fill-foreground text-2xl font-bold`}
                         >
-                          {tasksTotal}
+                          {totalTasks}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
@@ -108,12 +120,12 @@ export function RadialChart() {
               dataKey="completed"
               stackId="a"
               cornerRadius={5}
-              fill="var(--color-desktop)"
+              fill={chartConfig.desktop.color}
               className="stroke-transparent stroke-2"
             />
             <RadialBar
               dataKey="pending"
-              fill="var(--color-mobile)"
+              fill={chartConfig.mobile.color}
               stackId="a"
               cornerRadius={5}
               className="stroke-transparent stroke-2"

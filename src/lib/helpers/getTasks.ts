@@ -1,6 +1,12 @@
 import { API_URL } from "../constants";
+import type { Task } from "../types/types";
 
-export async function getTasks() {
+export type getTasksResponse = {
+  length: number;
+  tasks: Task[];
+};
+
+export async function getTasks(): Promise<getTasksResponse> {
   try {
     const res = await fetch(`${API_URL}/tasks`);
 

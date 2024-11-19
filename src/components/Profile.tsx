@@ -1,7 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
+import { getTasks } from "@/lib/helpers/getTasks";
 import { UserName } from "./UserName";
+import type { Task } from "@/lib/types/types";
 
-export function Profile() {
+export async function Profile() {
+  const tasks = await getTasks();
+  const totalTasks = tasks.length;
+  const activeTasks = tasks.tasks.filter(
+    (task: Task) => !task.completed,
+  ).length;
+  const completedTasks = tasks.tasks.filter(
+    (task: Task) => task.completed,
+  ).length;
+
   return (
     <main className="m-6">
       <div className="flex cursor-pointer items-center gap-3 rounded-[0.8rem] border-2 border-transparent bg-[#E6E6E6]/20 px-2 py-4 transition duration-300 ease-in-out hover:border-2 hover:border-white hover:bg-[#E6E6E6]/50">
@@ -27,7 +38,7 @@ export function Profile() {
             <p className="relative flex gap-2 pl-4">
               <span className="absolute left-[1px] top-1/2 h-[70%] w-[0.2rem] translate-y-[-50%] rounded-[5px] bg-purple-500"></span>
               <span className="text-4xl font-medium text-[#333] dark:text-white">
-                10
+                {totalTasks}
               </span>
             </p>
           </section>
@@ -36,7 +47,7 @@ export function Profile() {
             <p className="relative flex gap-2 pl-4">
               <span className="absolute left-[1px] top-1/2 h-[70%] w-[0.2rem] translate-y-[-50%] rounded-[5px] bg-[#3AAFAE]"></span>
               <span className="text-4xl font-medium text-[#333] dark:text-white">
-                6
+                {activeTasks}
               </span>
             </p>
           </section>
@@ -45,7 +56,7 @@ export function Profile() {
             <p className="relative flex gap-2 pl-4">
               <span className="absolute left-[1px] top-1/2 h-[70%] w-[0.2rem] translate-y-[-50%] rounded-[5px] bg-orange-400"></span>
               <span className="text-4xl font-medium text-[#333] dark:text-white">
-                2
+                {activeTasks}
               </span>
             </p>
           </section>
@@ -54,7 +65,7 @@ export function Profile() {
             <p className="relative flex gap-2 pl-4">
               <span className="absolute left-[1px] top-1/2 h-[70%] w-[0.2rem] translate-y-[-50%] rounded-[5px] bg-green-400"></span>
               <span className="text-4xl font-medium text-[#333] dark:text-white">
-                3
+                {completedTasks}
               </span>
             </p>
           </section>

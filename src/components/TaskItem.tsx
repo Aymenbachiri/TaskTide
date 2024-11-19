@@ -8,7 +8,7 @@ import { EditIcon } from "@/lib/icons/EditIcon";
 import { StarIcon } from "@/lib/icons/StarIcon";
 import { TrashIcon } from "@/lib/icons/TrashIcon";
 import type { Task } from "@/lib/types/types";
-import { cn } from "@/lib/utils/utils";
+import { cn, formatDate } from "@/lib/utils/utils";
 import { motion } from "framer-motion";
 
 export function TaskItem({ task }: { task: Task }) {
@@ -24,7 +24,9 @@ export function TaskItem({ task }: { task: Task }) {
         <p>{task.description}</p>
       </section>
       <div className="mt-auto flex items-center justify-between">
-        <p className="text-sm text-gray-400">{task.createdAt as string}</p>
+        <p className="text-sm text-gray-400">
+          {formatDate(task.createdAt as string)}
+        </p>
         <p
           className={cn("text-sm font-bold", getPriorityColor(task.priority!))}
         >
