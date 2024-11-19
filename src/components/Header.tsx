@@ -3,10 +3,14 @@ import { CreateNewTask } from "./CreateNewTask";
 import { MobileSidebar } from "./MobileSidebar";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { MobileProfileSidebar } from "./MobileProfileSidebar";
+import { getTasks } from "@/lib/helpers/getTasks";
+import type { Task } from "@/lib/types/types";
 
 export async function Header() {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
+  const tasks = await getTasks();
+  const activeTasks = tasks.tasks.filter((task: Task) => !task.completed);
 
   return (
     <header className="my-4 flex w-full flex-col gap-4 px-4 md:flex-row md:items-center md:justify-between md:px-6">
@@ -23,7 +27,10 @@ export async function Header() {
           <p>
             {user ? (
               <>
-                you have <span className="font-bold text-[#3aafae]">5</span>{" "}
+                you have{" "}
+                <span className="font-bold text-[#3aafae]">
+                  {activeTasks.length}
+                </span>{" "}
                 active tasks
               </>
             ) : (
