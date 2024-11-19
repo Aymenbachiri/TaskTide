@@ -6,7 +6,7 @@ import { OverdueTasks } from "../OverdueTasks";
 export default function OverduePage() {
   return (
     <main className="m-6 h-full">
-      <section className="flex justify-between">
+      <section className="flex flex-col justify-between md:flex-row">
         <h1 className="text-2xl font-bold">Overdue Tasks</h1>
         <Filters />
       </section>

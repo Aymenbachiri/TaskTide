@@ -15,16 +15,20 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <TasksProvider>
           <NextTopLoader />
           <Toaster expand={true} richColors position="top-left" />
-          <div className="flex h-full overflow-hidden">
-            <MiniSidebar />
+          <div className="flex h-full md:overflow-hidden">
+            {/* Desktop Sidebar */}
+            <div className="hidden md:flex">
+              <MiniSidebar />
+            </div>
             <div className="flex flex-1 flex-col">
               <Header />
-              <div
-                style={{ width: "83%" }}
-                className="flex h-full pb-[1.5rem] pr-[20rem]"
-              >
-                <MainLayout>{children}</MainLayout>
-                <SidebarProvider />
+              <div className="flex h-full flex-col md:flex-row">
+                <div className="w-full px-4 md:w-[83%] md:pb-6 md:pr-[20rem]">
+                  <MainLayout>{children}</MainLayout>
+                </div>
+                <div className="hidden md:flex">
+                  <SidebarProvider />
+                </div>
               </div>
             </div>
           </div>

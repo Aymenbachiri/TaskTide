@@ -6,7 +6,7 @@ import { AddNewTaskBtn } from "../AddNewTaskBtn";
 export default function HomePage() {
   return (
     <main className="m-6 h-full">
-      <section className="flex justify-between">
+      <section className="flex flex-col justify-between md:flex-row">
         <h1 className="text-2xl font-bold">All Tasks</h1>
         <Filters />
       </section>
