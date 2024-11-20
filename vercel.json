@@ -1,5 +1,7 @@
 {
-  "buildSettings": {
-    "ignoreBuildErrors": true
+  "build": {
+    "env": {
+      "SKIP_TYPESCRIPT_CHECK": "true"
+    }
   }
 }
