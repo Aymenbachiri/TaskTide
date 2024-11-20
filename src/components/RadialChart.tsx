@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
 import {
@@ -18,9 +17,8 @@ import {
   ChartTooltipContent,
 } from "./ui/chart";
 import { TrendingUp } from "@/lib/icons/TrendingUp";
-import { Task } from "@/lib/types/types";
-import { getTasks, getTasksResponse } from "@/lib/helpers/getTasks";
 import { RadialChartSkeleton } from "./RadialChartSkeleton";
+import { useTasks } from "@/lib/context/TaskContext";
 
 const chartConfig: ChartConfig = {
   desktop: {
@@ -35,33 +33,11 @@ const chartConfig: ChartConfig = {
 
 export function RadialChart() {
   const { theme } = useTheme();
-  const [chartData, setChartData] = useState<{
-    totalTasks: number;
-    activeTasks: number;
-    completedTasks: number;
-  } | null>(null);
+  const { loading, totalTasks, activeTasks, completedTasks } = useTasks();
 
-  useEffect(() => {
-    async function fetchData() {
-      const tasks: getTasksResponse = await getTasks();
-      const totalTasks = tasks.length;
-      const activeTasks = tasks.tasks.filter(
-        (task: Task) => !task.completed,
-      ).length;
-      const completedTasks = tasks.tasks.filter(
-        (task: Task) => task.completed,
-      ).length;
-      setChartData({ totalTasks, activeTasks, completedTasks });
-    }
-
-    fetchData();
-  }, []);
-
-  if (!chartData) {
+  if (loading) {
     return <RadialChartSkeleton />;
   }
-
-  const { totalTasks, activeTasks, completedTasks } = chartData;
 
   return (
     <Card className="flex flex-col border-2 border-white bg-[#EDEDED] shadow-none dark:bg-[#1A1A1A] dark:text-white">
@@ -75,7 +51,9 @@ export function RadialChart() {
           className="mx-auto aspect-square w-full max-w-[250px] dark:bg-[#1A1A1A]"
         >
           <RadialBarChart
-            data={[{ pending: activeTasks, completed: completedTasks }]}
+            data={[
+              { pending: activeTasks.length, completed: completedTasks.length },
+            ]}
             endAngle={180}
             innerRadius={80}
             outerRadius={130}

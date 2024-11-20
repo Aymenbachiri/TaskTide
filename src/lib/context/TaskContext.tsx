@@ -39,6 +39,7 @@ type TasksContextType = {
   completedTasks: Task[];
   profileModal: boolean;
   refreshTasks: () => Promise<void>;
+  totalTasks: number;
 };
 
 const TasksContext = createContext<TasksContextType | undefined>(undefined);
@@ -219,6 +220,7 @@ export const TasksProvider = ({ children }: { children: React.ReactNode }) => {
       }));
     };
 
+  const totalTasks = tasks.length;
   const completedTasks = tasks.filter((task) => task.completed);
   const activeTasks = tasks.filter((task) => !task.completed);
 
@@ -252,6 +254,7 @@ export const TasksProvider = ({ children }: { children: React.ReactNode }) => {
         completedTasks,
         profileModal,
         refreshTasks,
+        totalTasks,
       }}
     >
       {children}
