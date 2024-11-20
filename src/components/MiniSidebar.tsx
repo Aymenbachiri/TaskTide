@@ -3,7 +3,8 @@ import { MyLink } from "./common/MyLink";
 import { IconFileCheck } from "@/lib/icons/IconFileCheck";
 import { IconCheck } from "@/lib/icons/IconCheck";
 import { IconStopwatch } from "@/lib/icons/IconStopwatch";
-import { IconDeleteAll } from "@/lib/icons/IconDeleteAll";
+import { MyImage } from "./common/MyImage";
+import img from "/public/assets/images/logo.webp";
 
 export function MiniSidebar() {
   const navItems = [
@@ -31,7 +32,16 @@ export function MiniSidebar() {
 
   return (
     <main className="flex h-full w-full basis-[5rem] flex-col bg-[#f9f9f9] dark:bg-[#1A1A1A]">
-      <span className="flex h-[5rem] items-center justify-center">Logo</span>
+      <section className="flex h-[5rem] items-center justify-center p-2">
+        <MyImage
+          src={img}
+          alt="logo"
+          width={50}
+          height={50}
+          style={{ borderRadius: 50 }}
+          placeholder="blur"
+        />
+      </section>
       <div className="mt-8 flex flex-1 flex-col items-center justify-between">
         <ul className="flex flex-col gap-10">
           {navItems.map((item, index) => (
@@ -43,11 +53,6 @@ export function MiniSidebar() {
             </li>
           ))}
         </ul>
-        <section className="mb-[1.5rem]">
-          <button className="flex h-12 w-12 items-center justify-center rounded-full border-2">
-            <IconDeleteAll />
-          </button>
-        </section>
       </div>
     </main>
   );

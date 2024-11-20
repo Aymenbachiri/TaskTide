@@ -5,6 +5,8 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { MobileProfileSidebar } from "./MobileProfileSidebar";
 import { getTasks } from "@/lib/helpers/getTasks";
 import type { Task } from "@/lib/types/types";
+import { MyImage } from "./common/MyImage";
+import img from "/public/assets/images/logo.webp";
 
 export async function Header() {
   const { getUser } = getKindeServerSession();
@@ -40,7 +42,14 @@ export async function Header() {
         </section>
       </div>
       <div className="flex md:hidden">
-        <span>Logo</span>
+        <MyImage
+          src={img}
+          alt="logo"
+          width={100}
+          height={100}
+          style={{ borderRadius: 50 }}
+          placeholder="blur"
+        />
       </div>
 
       <section className="flex flex-col gap-4 md:flex-row md:items-center md:gap-[10.4rem]">
