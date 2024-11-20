@@ -35,7 +35,7 @@ export function Modal() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!task) return;
 
     try {
