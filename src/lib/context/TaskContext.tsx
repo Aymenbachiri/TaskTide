@@ -1,66 +1,103 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import { toast } from "sonner";
 import { API_URL } from "../constants";
-import { Task } from "../types/types";
+
+type Task = {
+  id: string;
+  title: string;
+  description?: string;
+  completed: boolean;
+  priority?: "low" | "medium" | "high";
+  createdAt?: string;
+  dueDate?: string;
+};
 
 type TasksContextType = {
   tasks: Task[];
+  loading: boolean;
   task: Task | null;
+  getTaskById: (taskId: string) => Promise<void>;
+  createTask: (task: Partial<Task>) => Promise<void>;
+  updateTask: (task: Task) => Promise<void>;
+  deleteTask: (taskId: string) => Promise<void>;
   priority: string;
-  isEditing: boolean;
-  activeTask: Task | null;
-  modalMode: string;
-  profileModal: boolean;
-  getTasks: () => void;
-  getTaskById: (id: string) => void;
-  createTask: (task: Task) => void;
-  updateTask: (task: Task) => void;
-  deleteTask: (id: string) => void;
-  setPriority: (priority: string) => void;
-  setIsEditing: (editing: boolean) => void;
+  setPriority: React.Dispatch<React.SetStateAction<string>>;
   handleInput: (
     name: string,
-  ) => (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) => void;
+  ) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  isEditing: boolean;
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
   openModalForAdd: () => void;
   openModalForEdit: (task: Task) => void;
-  openProfileModal: () => void;
+  activeTask: Task | null;
   closeModal: () => void;
+  modalMode: string;
+  openProfileModal: () => void;
+  activeTasks: Task[];
+  completedTasks: Task[];
+  profileModal: boolean;
+  refreshTasks: () => Promise<void>;
 };
 
 const TasksContext = createContext<TasksContextType | undefined>(undefined);
 
-export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
-  const [task, setTask] = useState<Task | null>(null);
+const DEFAULT_TASK = {
+  id: "",
+  title: "",
+  description: "",
+  completed: false,
+  priority: "low",
+  dueDate: "",
+};
+
+export const TasksProvider = ({ children }: { children: React.ReactNode }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true); // Start with loading true
+  const [task, setTask] = useState<Task | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [priority, setPriority] = useState("all");
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [modalMode, setModalMode] = useState("");
   const [profileModal, setProfileModal] = useState(false);
 
+  const getTasks = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/tasks`);
+      if (!response.ok) throw new Error("Failed to fetch tasks");
+      const data = await response.json();
+      setTasks(data.tasks || []); // Ensure we handle empty response
+    } catch (error) {
+      console.error("Error getting tasks:", error);
+      toast.error("Failed to fetch tasks");
+      setTasks([]); // Set empty array on error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add a refresh function that can be called from components
+  const refreshTasks = async () => {
+    await getTasks();
+  };
+
   const openModalForAdd = () => {
     setModalMode("add");
     setIsEditing(true);
-    setTask(null);
+    setTask({ ...DEFAULT_TASK }); // Use spread to create new object
+    setActiveTask(null);
   };
 
-  const openModalForEdit = (task: Task) => {
+  const openModalForEdit = (taskToEdit: Task) => {
     setModalMode("edit");
     setIsEditing(true);
-    setActiveTask(task);
+    setActiveTask(taskToEdit);
+    setTask({ ...taskToEdit }); // Use spread to create new object
   };
 
-  const openProfileModal = () => {
-    setProfileModal(true);
-  };
+  const openProfileModal = () => setProfileModal(true);
 
   const closeModal = () => {
     setIsEditing(false);
@@ -70,145 +107,161 @@ export const TasksProvider: React.FC<{ children: React.ReactNode }> = ({
     setTask(null);
   };
 
+  const getTaskById = async (taskId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/tasks/${taskId}`);
+      if (!response.ok) throw new Error("Failed to fetch task");
+      const data = await response.json();
+      setTask(data);
+    } catch (error) {
+      console.error("Error getting task:", error);
+      toast.error("Failed to fetch task");
+    }
+  };
+
+  const createTask = async (newTask: Partial<Task>) => {
+    await toast.promise(
+      async () => {
+        const response = await fetch(`${API_URL}/tasks`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(newTask),
+        });
+
+        if (!response.ok) throw new Error("Failed to create task");
+
+        const data = await response.json();
+        await refreshTasks(); // Refresh the full task list
+        return data;
+      },
+      {
+        loading: "Creating task...",
+        success: "Task created successfully!",
+        error: "Failed to create task.",
+      },
+    );
+  };
+
+  const updateTask = async (updatedTask: Task) => {
+    if (!updatedTask.id) {
+      toast.error("Invalid task ID");
+      return;
+    }
+
+    await toast.promise(
+      async () => {
+        const response = await fetch(`${API_URL}/tasks/${updatedTask.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedTask),
+        });
+
+        if (!response.ok) throw new Error("Failed to update task");
+
+        await refreshTasks(); // Refresh the full task list
+        const data = await response.json();
+        return data;
+      },
+      {
+        loading: "Updating task...",
+        success: "Task updated successfully!",
+        error: "Failed to update task.",
+      },
+    );
+  };
+
+  const deleteTask = async (taskId: string) => {
+    await toast.promise(
+      async () => {
+        const response = await fetch(`${API_URL}/tasks/${taskId}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) throw new Error("Failed to delete task");
+
+        await refreshTasks(); // Refresh the full task list
+      },
+      {
+        loading: "Deleting task...",
+        success: "Task deleted successfully!",
+        error: "Failed to delete task.",
+      },
+    );
+  };
+
   const handleInput =
-    (name: string) =>
+    (key: keyof Task) =>
     (
       e: React.ChangeEvent<
         HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
       >,
     ) => {
-      if (name === "setTask") {
-        setTask(e);
-      } else {
-        setTask({ ...task, [name]: e.target.value });
+      if (!e?.target) return;
+
+      let value: string | boolean = e.target.value;
+
+      // Handle boolean values from select elements
+      if (
+        e.target.type === "select-one" &&
+        (value === "true" || value === "false")
+      ) {
+        value = value === "true";
       }
+
+      setTask((prevTask) => ({
+        ...(prevTask || DEFAULT_TASK),
+        [key]: value,
+      }));
     };
 
-  const getTasks = async () => {
-    try {
-      const response = await fetch(`${API_URL}/tasks`);
-      if (!response.ok) {
-        throw new Error("Error fetching tasks");
-      }
-      const data = await response.json();
-      setTasks(data.tasks);
-    } catch (error) {
-      console.log("Error getting tasks", error);
-    }
-  };
+  const completedTasks = tasks.filter((task) => task.completed);
+  const activeTasks = tasks.filter((task) => !task.completed);
 
-  const getTaskById = async (taskId: string) => {
-    try {
-      const response = await fetch(`${API_URL}/task/${taskId}`);
-      if (!response.ok) {
-        throw new Error("Error fetching task");
-      }
-      const data = await response.json();
-      setTask(data);
-    } catch (error) {
-      console.log("Error getting task", error);
-    }
-  };
-
-  const createTask = async (task: Task) => {
-    try {
-      const response = await fetch(`${API_URL}/task/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(task),
-      });
-
-      if (!response.ok) {
-        throw new Error("Error creating task");
-      }
-      const data = await response.json();
-
-      setTasks([...tasks, data]);
-      toast.success("Task created successfully");
-    } catch (error) {
-      console.log("Error creating task", error);
-    }
-  };
-
-  const updateTask = async (task: Task) => {
-    try {
-      const response = await fetch(`${API_URL}/task/${task.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(task),
-      });
-
-      if (!response.ok) {
-        throw new Error("Error updating task");
-      }
-      const data = await response.json();
-
-      const newTasks = tasks.map((tsk) => {
-        return tsk?.id === data.id ? data : tsk;
-      });
-
-      toast.success("Task updated successfully");
-
-      setTasks(newTasks);
-    } catch (error) {
-      console.log("Error updating task", error);
-    }
-  };
-
-  const deleteTask = async (taskId: string) => {
-    try {
-      const response = await fetch(`${API_URL}/task/${taskId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Error deleting task");
-      }
-
-      const newTasks = tasks.filter((tsk) => tsk.id !== taskId);
-
-      setTasks(newTasks);
-    } catch (error) {
-      console.log("Error deleting task", error);
-    }
-  };
-
-  const contextValue: TasksContextType = {
-    task,
-    priority,
-    isEditing,
-    activeTask,
-    modalMode,
-    profileModal,
-    setPriority,
-    setIsEditing,
-    handleInput,
-    openModalForAdd,
-    openModalForEdit,
-    openProfileModal,
-    closeModal,
-    tasks,
-    deleteTask,
-    updateTask,
-    createTask,
-    getTasks,
-    getTaskById,
-  };
+  // Initial data fetch
+  useEffect(() => {
+    getTasks();
+  }, []);
 
   return (
-    <TasksContext.Provider value={contextValue}>
+    <TasksContext.Provider
+      value={{
+        tasks,
+        loading,
+        task,
+        getTaskById,
+        createTask,
+        updateTask,
+        deleteTask,
+        priority,
+        setPriority,
+        handleInput,
+        isEditing,
+        setIsEditing,
+        openModalForAdd,
+        openModalForEdit,
+        activeTask,
+        closeModal,
+        modalMode,
+        openProfileModal,
+        activeTasks,
+        completedTasks,
+        profileModal,
+        refreshTasks,
+      }}
+    >
       {children}
     </TasksContext.Provider>
   );
 };
 
-export const useTasks = () => {
+export const useTasks = (): TasksContextType => {
   const context = useContext(TasksContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useTasks must be used within a TasksProvider");
   }
   return context;

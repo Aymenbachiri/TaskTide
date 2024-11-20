@@ -1,4 +1,4 @@
-function SkeletonTaskItem() {
+export function SkeletonTaskItem() {
   return (
     <div className="flex h-[16rem] animate-pulse flex-col gap-4 rounded-lg border-2 border-gray-300 bg-gray-200 p-4 shadow-sm dark:border-gray-600 dark:bg-gray-700">
       <div className="h-6 w-3/4 rounded-md bg-gray-300 dark:bg-gray-600"></div>

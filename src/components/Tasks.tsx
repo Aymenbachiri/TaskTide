@@ -4,8 +4,9 @@ import type { Task } from "@/lib/types/types";
 import { filteredTasks } from "@/lib/utils/utils";
 import { TaskItem } from "./TaskItem";
 
-export function Tasks({ tasks }: { tasks: Task[] }) {
-  const { priority } = useTasks();
+export function Tasks() {
+  const { priority, tasks } = useTasks();
+
   const filtered = filteredTasks(tasks, priority);
 
   return (

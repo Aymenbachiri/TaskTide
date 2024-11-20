@@ -14,6 +14,7 @@ export function Modal() {
     modalMode,
     activeTask,
     updateTask,
+    refreshTasks,
   } = useTasks();
   const ref = useRef(null);
 
@@ -28,26 +29,33 @@ export function Modal() {
 
   useEffect(() => {
     if (modalMode === "edit" && activeTask) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      handleInput("setTask")(activeTask as any);
+      handleInput("setTask")(activeTask);
     }
   }, [modalMode, activeTask, handleInput]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    if (!task) return;
 
-    if (modalMode === "edit") {
-      updateTask(task as Task);
-    } else if (modalMode === "add") {
-      createTask(task as Task);
+    try {
+      if (modalMode === "edit") {
+        await updateTask(task as Task);
+      } else if (modalMode === "add") {
+        await createTask(task as Task);
+      }
+      await refreshTasks(); // Refresh tasks after successful submission
+      closeModal();
+    } catch (error) {
+      console.error("Error submitting form:", error);
     }
-    closeModal();
   };
+
+  if (!isEditing) return null;
 
   return (
     <div className="fixed left-0 top-0 z-50 h-full w-full overflow-hidden bg-[#333]/30">
       <form
-        action=""
         className="absolute left-1/2 top-1/2 flex w-full max-w-[520px] -translate-x-1/2 -translate-y-1/2 transform flex-col gap-3 rounded-lg bg-white px-6 py-5 shadow-md dark:bg-[#0D0D0D]"
         onSubmit={handleSubmit}
         ref={ref}
@@ -60,8 +68,9 @@ export function Modal() {
             id="title"
             placeholder="Task Title"
             name="title"
-            value={task?.title}
+            value={task?.title || ""}
             onChange={(e) => handleInput("title")(e)}
+            required
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -71,7 +80,7 @@ export function Modal() {
             name="description"
             placeholder="Task Description"
             rows={4}
-            value={task?.description}
+            value={task?.description || ""}
             onChange={(e) => handleInput("description")(e)}
           />
         </div>
@@ -80,7 +89,7 @@ export function Modal() {
           <select
             className="cursor-pointer rounded-md border bg-[#F9F9F9] p-2 dark:bg-[#1A1A1A]"
             name="priority"
-            value={task?.priority}
+            value={task?.priority || "low"}
             onChange={(e) => handleInput("priority")(e)}
           >
             <option value="low">Low</option>
