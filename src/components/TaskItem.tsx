@@ -24,7 +24,7 @@ export function TaskItem({ task }: { task: Task }) {
       </section>
       <div className="mt-auto flex items-center justify-between">
         <p className="text-sm text-gray-400">
-          {formatDate(task.dueDate as string)}
+          {formatDate(task.duedate as string)}
         </p>
         <p
           className={cn("text-sm font-bold", getPriorityColor(task.priority!))}

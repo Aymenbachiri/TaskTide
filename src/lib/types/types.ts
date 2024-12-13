@@ -6,4 +6,5 @@ export type Task = {
   priority?: "low" | "medium" | "high";
   createdAt?: string;
   dueDate?: string;
+  duedate?: string;
 };
