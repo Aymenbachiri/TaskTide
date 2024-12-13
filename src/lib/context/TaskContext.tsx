@@ -66,7 +66,13 @@ export const TasksProvider = ({ children }: { children: React.ReactNode }) => {
   const getTasks = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/tasks`);
+      const response = await fetch(`${API_URL}/tasks`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
       if (!response.ok) throw new Error("Failed to fetch tasks");
       const data = await response.json();
       setTasks(data.tasks || []); // Ensure we handle empty response
